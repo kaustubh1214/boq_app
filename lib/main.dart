@@ -1,50 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-import 'data.dart';
-import 'login.dart';
-import 'manager.dart';
-import 'site.dart';
-import 'widgets.dart';
+import 'config.dart';
+import 'shell.dart';
 
-void main() => runApp(const BoqApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: paper,
+    statusBarIconBrightness: Brightness.dark,
+    systemNavigationBarColor: paper,
+    systemNavigationBarIconBrightness: Brightness.dark,
+  ));
+  runApp(const BoqApp());
+}
 
-class BoqApp extends StatefulWidget {
+class BoqApp extends StatelessWidget {
   const BoqApp({super.key});
 
   @override
-  State<BoqApp> createState() => _BoqAppState();
-}
-
-class _BoqAppState extends State<BoqApp> {
-  final store = DemoStore();
-
-  @override
   Widget build(BuildContext context) {
-    return Scope(
-      store: store,
-      child: MaterialApp(
-        title: 'AV BOQ',
-        debugShowCheckedModeBanner: false,
-        theme: buildTheme(),
-        home: const Root(),
+    final scheme = ColorScheme.fromSeed(seedColor: gold, primary: ink, surface: paper, error: danger);
+    return MaterialApp(
+      title: 'AV BOQ',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: scheme,
+        scaffoldBackgroundColor: paper,
+        appBarTheme: const AppBarTheme(backgroundColor: paper, foregroundColor: ink, elevation: 0, scrolledUnderElevation: 0),
+        filledButtonTheme: FilledButtonThemeData(
+          style: FilledButton.styleFrom(
+            backgroundColor: ink,
+            foregroundColor: paper,
+            minimumSize: const Size(0, 48),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: ink,
+            minimumSize: const Size(0, 48),
+            side: const BorderSide(color: hairline),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: hairline)),
+          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: hairline)),
+          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: gold, width: 2)),
+        ),
       ),
+      home: const Shell(),
     );
-  }
-}
-
-class Root extends StatelessWidget {
-  const Root({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final s = Scope.of(context);
-    switch (s.role) {
-      case null:
-        return const LoginScreen();
-      case Role.siteUser:
-        return const SiteShell();
-      case Role.storeManager:
-        return const ManagerShell();
-    }
   }
 }

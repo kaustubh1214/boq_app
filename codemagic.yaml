@@ -1,7 +1,7 @@
 workflows:
-  android-demo:
-    name: AV BOQ Android demo
-    max_build_duration: 30
+  android-app:
+    name: AV BOQ Android app
+    max_build_duration: 45
     instance_type: mac_mini_m2
     environment:
       flutter: stable
@@ -11,11 +11,19 @@ workflows:
           flutter create --platforms=android --org in.avgroup --project-name boq_app .
           rm -rf test
           rm -f analysis_options.yaml
-          sed -i.bak 's/android:label="[^"]*"/android:label="AV BOQ"/' android/app/src/main/AndroidManifest.xml
-          rm -f android/app/src/main/AndroidManifest.xml.bak
+          M=android/app/src/main/AndroidManifest.xml
+          # App name, internet + camera (QR scan, invoice photos), and plain http for an office-Wi-Fi server address.
+          perl -0pi -e 's/android:label="[^"]*"/android:label="AV BOQ"/' "$M"
+          perl -0pi -e 's/<application/<application android:usesCleartextTraffic="true"/' "$M"
+          perl -0pi -e 's#(\n\s*)<application#$1<uses-permission android:name="android.permission.INTERNET"/>$1<uses-permission android:name="android.permission.CAMERA"/>$1<application#' "$M"
+          cat "$M"
       - name: Get packages
         script: flutter pub get
+      - name: App icon
+        script: dart run flutter_launcher_icons
+      - name: Check the code
+        script: flutter analyze --no-fatal-infos --no-fatal-warnings lib
       - name: Build release APK
         script: flutter build apk --release
     artifacts:
-      - build/app/outputs/flutter-apk/*.apk
+      - build/app/outputs/flutter-apk/app-release.apk
