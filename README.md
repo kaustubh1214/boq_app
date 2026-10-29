@@ -20,7 +20,7 @@ Default address: `https://keturah-incontestable-subaxially.ngrok-free.dev` (`lib
 On the office laptop: Docker stack running (`docker compose up -d` in `boq-management/`) and
 
 ```bash
-ngrok http --url=keturah-incontestable-subaxially.ngrok-free.dev 3100
+ngrok http --url=keturah-incontestable-subaxially.ngrok-free.dev http://127.0.0.2:3100
 ```
 
 The app sends its own user agent (`AVBOQ-Android/1.0`), so ngrok's free-plan warning page is skipped.
