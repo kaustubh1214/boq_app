@@ -177,6 +177,10 @@ class _ShellState extends State<Shell> {
   }
 
   Future<void> _scan() async {
+    if (!await ensureCameraPermission(context) || !mounted) {
+      await _web?.runJavaScript('window.__avboqScan && window.__avboqScan(null)');
+      return;
+    }
     final text = await Navigator.of(context).push<String>(MaterialPageRoute(builder: (_) => const ScannerPage()));
     await _web?.runJavaScript('window.__avboqScan && window.__avboqScan(${jsonEncode(text)})');
   }
@@ -192,6 +196,8 @@ class _ShellState extends State<Shell> {
     }
     try {
       if (fromCamera) {
+        // Android refuses the camera to an app that declares the permission but was not given it.
+        if (!mounted || !await ensureCameraPermission(context)) return const [];
         final x = await ImagePicker().pickImage(source: ImageSource.camera, imageQuality: 80, maxWidth: 2000);
         return x == null ? const [] : [Uri.file(x.path).toString()];
       }
